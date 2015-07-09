@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  if (self.fetch) {
+  if (self.fetchp) {
     return
   }
 
@@ -22,10 +22,10 @@
     return value
   }
 
-  function Headers(headers) {
+  function JSONPHeaders(headers) {
     this.map = {}
 
-    if (headers instanceof Headers) {
+    if (headers instanceof JSONPHeaders) {
       headers.forEach(function(value, name) {
         this.append(name, value)
       }, this)
@@ -37,7 +37,7 @@
     }
   }
 
-  Headers.prototype.append = function(name, value) {
+  JSONPHeaders.prototype.append = function(name, value) {
     name = normalizeName(name)
     value = normalizeValue(value)
     var list = this.map[name]
@@ -48,28 +48,28 @@
     list.push(value)
   }
 
-  Headers.prototype['delete'] = function(name) {
+  JSONPHeaders.prototype['delete'] = function(name) {
     delete this.map[normalizeName(name)]
   }
 
-  Headers.prototype.get = function(name) {
+  JSONPHeaders.prototype.get = function(name) {
     var values = this.map[normalizeName(name)]
     return values ? values[0] : null
   }
 
-  Headers.prototype.getAll = function(name) {
+  JSONPHeaders.prototype.getAll = function(name) {
     return this.map[normalizeName(name)] || []
   }
 
-  Headers.prototype.has = function(name) {
+  JSONPHeaders.prototype.has = function(name) {
     return this.map.hasOwnProperty(normalizeName(name))
   }
 
-  Headers.prototype.set = function(name, value) {
+  JSONPHeaders.prototype.set = function(name, value) {
     this.map[normalizeName(name)] = [normalizeValue(value)]
   }
 
-  Headers.prototype.forEach = function(callback, thisArg) {
+  JSONPHeaders.prototype.forEach = function(callback, thisArg) {
     Object.getOwnPropertyNames(this.map).forEach(function(name) {
       this.map[name].forEach(function(value) {
         callback.call(thisArg, value, name, this)
@@ -125,17 +125,7 @@
 
     this._initBody = function(body) {
       this._bodyInit = body
-      if (typeof body === 'string') {
-        this._bodyText = body
-      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
-        this._bodyBlob = body
-      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
-        this._bodyFormData = body
-      } else if (!body) {
-        this._bodyText = ''
-      } else {
-        throw new Error('unsupported BodyInit type')
-      }
+      this._bodyText = ''
     }
 
     if (support.blob) {
@@ -186,7 +176,7 @@
     }
 
     this.json = function() {
-      return this.text().then(JSON.parse)
+      return this._bodyInit
     }
 
     return this
@@ -200,17 +190,14 @@
     return (methods.indexOf(upcased) > -1) ? upcased : method
   }
 
-  function Request(url, options) {
+  function JSONPRequest(url, options) {
     options = options || {}
     this.url = url
 
-    this.credentials = options.credentials || 'omit'
-    this.headers = new Headers(options.headers)
-    this.method = normalizeMethod(options.method || 'GET')
-    this.mode = options.mode || null
-    this.referrer = null
+    this.headers = new JSONPHeaders()
+    this.method = 'GET'
 
-    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
+    if (options.body) {
       throw new TypeError('Body not allowed for GET or HEAD requests')
     }
     this._initBody(options.body)
@@ -230,8 +217,8 @@
   }
 
   function headers(xhr) {
-    var head = new Headers()
-    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
+    var head = new JSONPHeaders()
+    var pairs = xhr.getAllJSONPResponseJSONPHeaders().trim().split('\n')
     pairs.forEach(function(header) {
       var split = header.trim().split(':')
       var key = split.shift().trim()
@@ -241,9 +228,9 @@
     return head
   }
 
-  Body.call(Request.prototype)
+  Body.call(JSONPRequest.prototype)
 
-  function Response(bodyInit, options) {
+  function JSONPResponse(bodyInit, options) {
     if (!options) {
       options = {}
     }
@@ -254,77 +241,63 @@
     this.status = options.status
     this.ok = this.status >= 200 && this.status < 300
     this.statusText = options.statusText
-    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+    this.headers = options.headers instanceof JSONPHeaders ? options.headers : new JSONPHeaders(options.headers)
     this.url = options.url || ''
   }
 
-  Body.call(Response.prototype)
+  Body.call(JSONPResponse.prototype)
 
-  self.Headers = Headers;
-  self.Request = Request;
-  self.Response = Response;
+  self.JSONPHeaders = JSONPHeaders;
+  self.JSONPRequest = JSONPRequest;
+  self.JSONPResponse = JSONPResponse;
 
-  self.fetch = function(input, init) {
-    // TODO: Request constructor should accept input, init
+  self.fetchp = function(input, init) {
+    // TODO: JSONPRequest constructor should accept input, init
     var request
-    if (Request.prototype.isPrototypeOf(input) && !init) {
+    if (JSONPRequest.prototype.isPrototypeOf(input) && !init) {
       request = input
     } else {
-      request = new Request(input, init)
+      request = new JSONPRequest(input, init)
     }
 
     return new Promise(function(resolve, reject) {
-      var xhr = new XMLHttpRequest()
-
-      function responseURL() {
-        if ('responseURL' in xhr) {
-          return xhr.responseURL
-        }
-
-        // Avoid security warnings on getResponseHeader when not allowed by CORS
-        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-          return xhr.getResponseHeader('X-Request-URL')
-        }
-
-        return;
-      }
-
-      xhr.onload = function() {
-        var status = (xhr.status === 1223) ? 204 : xhr.status
-        if (status < 100 || status > 599) {
-          reject(new TypeError('Network request failed'))
-          return
-        }
+      var script = document.createElement('script');
+      script.type = 'text\/javascript';
+      script.async = true;
+      var body;
+      script.onload = function(event) {
+        // console.log('onload', arguments);
         var options = {
-          status: status,
-          statusText: xhr.statusText,
-          headers: headers(xhr),
-          url: responseURL()
+          status: 200,
+          statusText: 'Ok',
+          headers: new JSONPHeaders({}),
+          url: event.path[0].src
         }
-        var body = 'response' in xhr ? xhr.response : xhr.responseText;
-        resolve(new Response(body, options))
+        resolve(new JSONPResponse(body, options))
       }
-
-      xhr.onerror = function() {
+      script.onerror= function() {
         reject(new TypeError('Network request failed'))
-      }
+      };
+      var callback = makeCallback(function(response){
+        // console.log('callback', arguments);
+        body = response;
+      });
+      document.currentScript.parentNode.insertBefore(script, document.currentScript);
+      script.src = request.url + (request.url.indexOf('?') > -1 ? '' : '?') + 'callback=' + callback
 
-      xhr.open(request.method, request.url, true)
-
-      if (request.credentials === 'include') {
-        xhr.withCredentials = true
-      }
-
-      if ('responseType' in xhr && support.blob) {
-        xhr.responseType = 'blob'
-      }
-
-      request.headers.forEach(function(value, name) {
-        xhr.setRequestHeader(name, value)
-      })
-
-      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
     })
   }
-  self.fetch.polyfill = true
+
+  fetchp._callbacks = {};
+    
+  function ID() {
+    return '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  function makeCallback(callback) {
+    var name = ID()
+    fetchp._callbacks[name] = callback
+    return 'fetchp._callbacks.' + name
+  }
+
 })();

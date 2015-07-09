@@ -4,7 +4,7 @@ before_script: make
 script: make test
 env:
   global:
-    - SAUCE_USERNAME=github-fetch
+    - SAUCE_USERNAME=github-fetchp
     - SAUCE_ACCESS_KEY=c3d37f93-0c2e-4834-9da5-eddc0d8c6299
   matrix:
     - PHANTOMJS=1
@@ -22,4 +22,4 @@ deploy:
   on:
     all_branches: true
     tags: true
-    repo: github/fetch
+    repo: naderio/fetchp

@@ -1,12 +1,12 @@
 {
-  "name": "whatwg-fetch",
-  "version": "0.9.0",
-  "main": "fetch.js",
-  "repository": "github/fetch",
+  "name": "fetchp",
+  "version": "0.1.0",
+  "main": "fetchp.js",
+  "repository": "naderio/fetchp",
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/github/fetch/blob/master/LICENSE"
+      "url": "https://github.com/naderio/fetchp/blob/master/LICENSE"
     }
   ],
   "devDependencies": {
@@ -19,6 +19,6 @@
   },
   "files" : [
     "LICENSE",
-    "fetch.js"
+    "fetchp.js"
   ]
 }

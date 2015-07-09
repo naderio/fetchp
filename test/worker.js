@@ -5,7 +5,7 @@ mocha.setup('tdd')
 self.assert = chai.assert
 
 importScripts('../bower_components/es6-promise/promise.js')
-importScripts('../fetch.js')
+importScripts('../fetchp.js')
 
 importScripts('test.js')
 

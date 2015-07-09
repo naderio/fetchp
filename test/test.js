@@ -38,7 +38,7 @@ function readBlobAsBytes(blob) {
 }
 
 test('resolves promise on 500 error', function() {
-  return fetch('/boom').then(function(response) {
+  return fetchp('/boom').then(function(response) {
     assert.equal(response.status, 500)
     assert.equal(response.ok, false)
     return response.text()
@@ -48,14 +48,14 @@ test('resolves promise on 500 error', function() {
 })
 
 test.skip('rejects promise for network error', function() {
-  return fetch('/error').then(function(response) {
+  return fetchp('/error').then(function(response) {
     assert(false, 'HTTP status ' + response.status + ' was treated as success')
   }).catch(function(error) {
     assert(error instanceof TypeError, 'Rejected with Error')
   })
 })
 
-// https://fetch.spec.whatwg.org/#headers-class
+// https://fetchp.spec.whatwg.org/#headers-class
 suite('Headers', function() {
   test('constructor copies headers', function() {
     var original = new Headers()
@@ -163,10 +163,10 @@ suite('Headers', function() {
   })
  })
 
-// https://fetch.spec.whatwg.org/#request-class
+// https://fetchp.spec.whatwg.org/#request-class
 suite('Request', function() {
   test('sends request headers', function() {
-    return fetch('/request', {
+    return fetchp('/request', {
       headers: {
         'Accept': 'application/json',
         'X-Test': '42'
@@ -179,7 +179,7 @@ suite('Request', function() {
     })
   })
 
-  test('fetch request', function() {
+  test('fetchp request', function() {
     var request = new Request('/request', {
       headers: {
         'Accept': 'application/json',
@@ -187,7 +187,7 @@ suite('Request', function() {
       }
     })
 
-    return fetch(request).then(function(response) {
+    return fetchp(request).then(function(response) {
       return response.json()
     }).then(function(json) {
       assert.equal(json.headers['accept'], 'application/json')
@@ -196,11 +196,11 @@ suite('Request', function() {
   })
 
   test('construct with url', function() {
-    var request = new Request('https://fetch.spec.whatwg.org/')
-    assert.equal(request.url, 'https://fetch.spec.whatwg.org/')
+    var request = new Request('https://fetchp.spec.whatwg.org/')
+    assert.equal(request.url, 'https://fetchp.spec.whatwg.org/')
   })
 
-  // https://fetch.spec.whatwg.org/#concept-bodyinit-extract
+  // https://fetchp.spec.whatwg.org/#concept-bodyinit-extract
   suite('BodyInit extract', function() {
     ;(Request.prototype.blob ? suite : suite.skip)('type Blob', function() {
       test('consume as blob', function() {
@@ -236,9 +236,9 @@ suite('Request', function() {
   })
 })
 
-// https://fetch.spec.whatwg.org/#response-class
+// https://fetchp.spec.whatwg.org/#response-class
 suite('Response', function() {
-  // https://fetch.spec.whatwg.org/#concept-bodyinit-extract
+  // https://fetchp.spec.whatwg.org/#concept-bodyinit-extract
   suite('BodyInit extract', function() {
     ;(Response.prototype.blob ? suite : suite.skip)('type Blob', function() {
       test('consume as blob', function() {
@@ -274,7 +274,7 @@ suite('Response', function() {
   })
 
   test('populates response body', function() {
-    return fetch('/hello').then(function(response) {
+    return fetchp('/hello').then(function(response) {
       assert.equal(response.status, 200)
       assert.equal(response.ok, true)
       return response.text()
@@ -284,7 +284,7 @@ suite('Response', function() {
   })
 
   test('parses response headers', function() {
-    return fetch('/headers?' + new Date().getTime()).then(function(response) {
+    return fetchp('/headers?' + new Date().getTime()).then(function(response) {
       assert.equal(response.headers.get('Date'), 'Mon, 13 Oct 2014 21:02:27 GMT')
       assert.equal(response.headers.get('Content-Type'), 'text/html; charset=utf-8')
     })
@@ -300,11 +300,11 @@ suite('Response', function() {
   })
 })
 
-// https://fetch.spec.whatwg.org/#body-mixin
+// https://fetchp.spec.whatwg.org/#body-mixin
 suite('Body mixin', function() {
   ;(Response.prototype.arrayBuffer ? suite : suite.skip)('arrayBuffer', function() {
     test('resolves arrayBuffer promise', function() {
-      return fetch('/hello').then(function(response) {
+      return fetchp('/hello').then(function(response) {
         return response.arrayBuffer()
       }).then(function(buf) {
         assert(buf instanceof ArrayBuffer, 'buf is an ArrayBuffer instance')
@@ -313,7 +313,7 @@ suite('Body mixin', function() {
     })
 
     test('arrayBuffer handles binary data', function() {
-      return fetch('/binary').then(function(response) {
+      return fetchp('/binary').then(function(response) {
         return response.arrayBuffer()
       }).then(function(buf) {
         assert(buf instanceof ArrayBuffer, 'buf is an ArrayBuffer instance')
@@ -326,7 +326,7 @@ suite('Body mixin', function() {
     })
 
     test('arrayBuffer handles utf-8 data', function() {
-      return fetch('/hello/utf8').then(function(response) {
+      return fetchp('/hello/utf8').then(function(response) {
         return response.arrayBuffer()
       }).then(function(buf) {
         assert(buf instanceof ArrayBuffer, 'buf is an ArrayBuffer instance')
@@ -337,7 +337,7 @@ suite('Body mixin', function() {
     })
 
     test('arrayBuffer handles utf-16le data', function() {
-      return fetch('/hello/utf16le').then(function(response) {
+      return fetchp('/hello/utf16le').then(function(response) {
         return response.arrayBuffer()
       }).then(function(buf) {
         assert(buf instanceof ArrayBuffer, 'buf is an ArrayBuffer instance')
@@ -348,7 +348,7 @@ suite('Body mixin', function() {
     })
 
     test('rejects arrayBuffer promise after body is consumed', function() {
-      return fetch('/hello').then(function(response) {
+      return fetchp('/hello').then(function(response) {
         assert(response.arrayBuffer, 'Body does not implement arrayBuffer')
         assert.equal(response.bodyUsed, false)
         response.blob()
@@ -362,7 +362,7 @@ suite('Body mixin', function() {
 
   ;(Response.prototype.blob ? suite : suite.skip)('blob', function() {
     test('resolves blob promise', function() {
-      return fetch('/hello').then(function(response) {
+      return fetchp('/hello').then(function(response) {
         return response.blob()
       }).then(function(blob) {
         assert(blob instanceof Blob, 'blob is a Blob instance')
@@ -371,7 +371,7 @@ suite('Body mixin', function() {
     })
 
     test('blob handles binary data', function() {
-      return fetch('/binary').then(function(response) {
+      return fetchp('/binary').then(function(response) {
         return response.blob()
       }).then(function(blob) {
         assert(blob instanceof Blob, 'blob is a Blob instance')
@@ -380,7 +380,7 @@ suite('Body mixin', function() {
     })
 
     test('blob handles utf-8 data', function() {
-      return fetch('/hello/utf8').then(function(response) {
+      return fetchp('/hello/utf8').then(function(response) {
         return response.blob()
       }).then(readBlobAsBytes).then(function(octets) {
         assert.equal(octets.length, 5, 'blob.size is correct')
@@ -389,7 +389,7 @@ suite('Body mixin', function() {
     })
 
     test('blob handles utf-16le data', function() {
-      return fetch('/hello/utf16le').then(function(response) {
+      return fetchp('/hello/utf16le').then(function(response) {
         return response.blob()
       }).then(readBlobAsBytes).then(function(octets) {
         assert.equal(octets.length, 10, 'blob.size is correct')
@@ -398,7 +398,7 @@ suite('Body mixin', function() {
     })
 
     test('rejects blob promise after body is consumed', function() {
-      return fetch('/hello').then(function(response) {
+      return fetchp('/hello').then(function(response) {
         assert(response.blob, 'Body does not implement blob')
         assert.equal(response.bodyUsed, false)
         response.text()
@@ -412,7 +412,7 @@ suite('Body mixin', function() {
 
   ;(Response.prototype.formData ? suite : suite.skip)('formData', function() {
     test('post sets content-type header', function() {
-      return fetch('/request', {
+      return fetchp('/request', {
         method: 'post',
         body: new FormData()
       }).then(function(response) {
@@ -424,7 +424,7 @@ suite('Body mixin', function() {
     })
 
     test('rejects formData promise after body is consumed', function() {
-      return fetch('/json').then(function(response) {
+      return fetchp('/json').then(function(response) {
         assert(response.formData, 'Body does not implement formData')
         response.formData()
         return response.formData()
@@ -434,7 +434,7 @@ suite('Body mixin', function() {
     })
 
     test('parses form encoded response', function() {
-      return fetch('/form').then(function(response) {
+      return fetchp('/form').then(function(response) {
         return response.formData()
       }).then(function(form) {
         assert(form instanceof FormData, 'Parsed a FormData object')
@@ -444,7 +444,7 @@ suite('Body mixin', function() {
 
   suite('json', function() {
     test('parses json response', function() {
-      return fetch('/json').then(function(response) {
+      return fetchp('/json').then(function(response) {
         return response.json()
       }).then(function(json) {
         assert.equal(json.name, 'Hubot')
@@ -453,7 +453,7 @@ suite('Body mixin', function() {
     })
 
     test('rejects json promise after body is consumed', function() {
-      return fetch('/json').then(function(response) {
+      return fetchp('/json').then(function(response) {
         assert(response.json, 'Body does not implement json')
         assert.equal(response.bodyUsed, false)
         response.text()
@@ -465,7 +465,7 @@ suite('Body mixin', function() {
     })
 
     test('handles json parse error', function() {
-      return fetch('/json-error').then(function(response) {
+      return fetchp('/json-error').then(function(response) {
         return response.json()
       }).catch(function(error) {
         assert(error instanceof Error, 'JSON exception is an Error instance')
@@ -476,7 +476,7 @@ suite('Body mixin', function() {
 
   suite('text', function() {
     test('handles 204 No Content response', function() {
-      return fetch('/empty').then(function(response) {
+      return fetchp('/empty').then(function(response) {
         assert.equal(response.status, 204)
         return response.text()
       }).then(function(body) {
@@ -485,7 +485,7 @@ suite('Body mixin', function() {
     })
 
     test('resolves text promise', function() {
-      return fetch('/hello').then(function(response) {
+      return fetchp('/hello').then(function(response) {
         return response.text()
       }).then(function(text) {
         assert.equal(text, 'hi')
@@ -493,7 +493,7 @@ suite('Body mixin', function() {
     })
 
     test('rejects text promise after body is consumed', function() {
-      return fetch('/hello').then(function(response) {
+      return fetchp('/hello').then(function(response) {
         assert(response.text, 'Body does not implement text')
         assert.equal(response.bodyUsed, false)
         response.text()
@@ -506,10 +506,10 @@ suite('Body mixin', function() {
   })
 })
 
-// https://fetch.spec.whatwg.org/#methods
+// https://fetchp.spec.whatwg.org/#methods
 suite('Methods', function() {
   test('supports HTTP GET', function() {
-    return fetch('/request', {
+    return fetchp('/request', {
       method: 'get',
     }).then(function(response) {
       return response.json()
@@ -539,7 +539,7 @@ suite('Methods', function() {
   })
 
   test('supports HTTP POST', function() {
-    return fetch('/request', {
+    return fetchp('/request', {
       method: 'post',
       body: 'name=Hubot'
     }).then(function(response) {
@@ -551,7 +551,7 @@ suite('Methods', function() {
   })
 
   test('supports HTTP PUT', function() {
-    return fetch('/request', {
+    return fetchp('/request', {
       method: 'put',
       body: 'name=Hubot'
     }).then(function(response) {
@@ -565,7 +565,7 @@ suite('Methods', function() {
   var patchSupported = !/PhantomJS/.test(navigator.userAgent)
 
   ;(patchSupported ? test : test.skip)('supports HTTP PATCH', function() {
-    return fetch('/request', {
+    return fetchp('/request', {
       method: 'PATCH',
       body: 'name=Hubot'
     }).then(function(response) {
@@ -577,7 +577,7 @@ suite('Methods', function() {
   })
 
   test('supports HTTP DELETE', function() {
-    return fetch('/request', {
+    return fetchp('/request', {
       method: 'delete',
     }).then(function(response) {
       return response.json()
@@ -588,10 +588,10 @@ suite('Methods', function() {
   })
 })
 
-// https://fetch.spec.whatwg.org/#atomic-http-redirect-handling
+// https://fetchp.spec.whatwg.org/#atomic-http-redirect-handling
 suite('Atomic HTTP redirect handling', function() {
   test('handles 301 redirect response', function() {
-    return fetch('/redirect/301').then(function(response) {
+    return fetchp('/redirect/301').then(function(response) {
       assert.equal(response.status, 200)
       assert.equal(response.ok, true)
       assert.match(response.url, /\/hello/)
@@ -602,7 +602,7 @@ suite('Atomic HTTP redirect handling', function() {
   })
 
   test('handles 302 redirect response', function() {
-    return fetch('/redirect/302').then(function(response) {
+    return fetchp('/redirect/302').then(function(response) {
       assert.equal(response.status, 200)
       assert.equal(response.ok, true)
       assert.match(response.url, /\/hello/)
@@ -613,7 +613,7 @@ suite('Atomic HTTP redirect handling', function() {
   })
 
   test('handles 303 redirect response', function() {
-    return fetch('/redirect/303').then(function(response) {
+    return fetchp('/redirect/303').then(function(response) {
       assert.equal(response.status, 200)
       assert.equal(response.ok, true)
       assert.match(response.url, /\/hello/)
@@ -624,7 +624,7 @@ suite('Atomic HTTP redirect handling', function() {
   })
 
   test('handles 307 redirect response', function() {
-    return fetch('/redirect/307').then(function(response) {
+    return fetchp('/redirect/307').then(function(response) {
       assert.equal(response.status, 200)
       assert.equal(response.ok, true)
       assert.match(response.url, /\/hello/)
@@ -637,7 +637,7 @@ suite('Atomic HTTP redirect handling', function() {
   var permanentRedirectSupported = !/PhantomJS|Trident/.test(navigator.userAgent)
 
   ;(permanentRedirectSupported ? test : test.skip)('handles 308 redirect response', function() {
-    return fetch('/redirect/308').then(function(response) {
+    return fetchp('/redirect/308').then(function(response) {
       assert.equal(response.status, 200)
       assert.equal(response.ok, true)
       assert.match(response.url, /\/hello/)
@@ -648,12 +648,12 @@ suite('Atomic HTTP redirect handling', function() {
   })
 })
 
-// https://fetch.spec.whatwg.org/#concept-request-credentials-mode
+// https://fetchp.spec.whatwg.org/#concept-request-credentials-mode
 suite('credentials mode', function() {
-  var omitSupported = !self.fetch.polyfill
+  var omitSupported = !self.fetchp.polyfill
 
   setup(function() {
-    return fetch('/cookie?name=foo&value=reset', {credentials: 'same-origin'});
+    return fetchp('/cookie?name=foo&value=reset', {credentials: 'same-origin'});
   })
 
   ;(omitSupported ? suite : suite.skip)('omit', function() {
@@ -663,8 +663,8 @@ suite('credentials mode', function() {
     })
 
     test('does not accept cookies with implicit omit credentials', function() {
-      return fetch('/cookie?name=foo&value=bar').then(function() {
-        return fetch('/cookie?name=foo', {credentials: 'same-origin'});
+      return fetchp('/cookie?name=foo&value=bar').then(function() {
+        return fetchp('/cookie?name=foo', {credentials: 'same-origin'});
       }).then(function(response) {
         return response.text()
       }).then(function(data) {
@@ -673,8 +673,8 @@ suite('credentials mode', function() {
     })
 
     test('does not accept cookies with omit credentials', function() {
-      return fetch('/cookie?name=foo&value=bar', {credentials: 'omit'}).then(function() {
-        return fetch('/cookie?name=foo', {credentials: 'same-origin'});
+      return fetchp('/cookie?name=foo&value=bar', {credentials: 'omit'}).then(function() {
+        return fetchp('/cookie?name=foo', {credentials: 'same-origin'});
       }).then(function(response) {
         return response.text()
       }).then(function(data) {
@@ -683,8 +683,8 @@ suite('credentials mode', function() {
     })
 
     test('does not send cookies with implicit omit credentials', function() {
-      return fetch('/cookie?name=foo&value=bar', {credentials: 'same-origin'}).then(function() {
-        return fetch('/cookie?name=foo');
+      return fetchp('/cookie?name=foo&value=bar', {credentials: 'same-origin'}).then(function() {
+        return fetchp('/cookie?name=foo');
       }).then(function(response) {
         return response.text()
       }).then(function(data) {
@@ -693,8 +693,8 @@ suite('credentials mode', function() {
     })
 
     test('does not send cookies with omit credentials', function() {
-      return fetch('/cookie?name=foo&value=bar').then(function() {
-        return fetch('/cookie?name=foo', {credentials: 'omit'})
+      return fetchp('/cookie?name=foo&value=bar').then(function() {
+        return fetchp('/cookie?name=foo', {credentials: 'omit'})
       }).then(function(response) {
         return response.text()
       }).then(function(data) {
@@ -710,8 +710,8 @@ suite('credentials mode', function() {
     })
 
     test('send cookies with same-origin credentials', function() {
-      return fetch('/cookie?name=foo&value=bar', {credentials: 'same-origin'}).then(function() {
-        return fetch('/cookie?name=foo', {credentials: 'same-origin'})
+      return fetchp('/cookie?name=foo&value=bar', {credentials: 'same-origin'}).then(function() {
+        return fetchp('/cookie?name=foo', {credentials: 'same-origin'})
       }).then(function(response) {
         return response.text()
       }).then(function(data) {
@@ -722,8 +722,8 @@ suite('credentials mode', function() {
 
   suite('include', function() {
     test('send cookies with include credentials', function() {
-      return fetch('/cookie?name=foo&value=bar', {credentials: 'include'}).then(function() {
-        return fetch('/cookie?name=foo', {credentials: 'include'})
+      return fetchp('/cookie?name=foo&value=bar', {credentials: 'include'}).then(function() {
+        return fetchp('/cookie?name=foo', {credentials: 'include'})
       }).then(function(response) {
         return response.text()
       }).then(function(data) {

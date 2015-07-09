@@ -1,15 +1,15 @@
-# window.fetch polyfill
+# window.fetchp
 
-The global `fetch` function is an easier way to make web requests and handle
+The global `fetchp` function is an easier way to make web requests and handle
 responses than using an XMLHttpRequest. This polyfill is written as closely as
-possible to the standard Fetch specification at https://fetch.spec.whatwg.org.
+possible to the standard Fetch specification at https://fetchp.spec.whatwg.org.
 
 ## Installation
 
-Available on [Bower](http://bower.io) as **fetch**.
+Available on [Bower](http://bower.io) as **fetchp**.
 
 ```sh
-$ bower install fetch
+$ bower install fetchp
 ```
 
 You'll also need a Promise polyfill for older browsers.
@@ -21,20 +21,20 @@ $ bower install es6-promise
 This can also be installed with `npm`.
 
 ```sh
-$ npm install whatwg-fetch --save
+$ npm install whatwg-fetchp --save
 ```
 
-(For a node.js implementation, try [node-fetch](https://github.com/bitinn/node-fetch))
+(For a node.js implementation, try [node-fetchp](https://github.com/bitinn/node-fetchp))
 
 ## Usage
 
-The `fetch` function supports any HTTP method. We'll focus on GET and POST
+The `fetchp` function supports any HTTP method. We'll focus on GET and POST
 example requests.
 
 ### HTML
 
 ```javascript
-fetch('/users.html')
+fetchp('/users.html')
   .then(function(response) {
     return response.text()
   }).then(function(body) {
@@ -45,7 +45,7 @@ fetch('/users.html')
 ### JSON
 
 ```javascript
-fetch('/users.json')
+fetchp('/users.json')
   .then(function(response) {
     return response.json()
   }).then(function(json) {
@@ -58,7 +58,7 @@ fetch('/users.json')
 ### Response metadata
 
 ```javascript
-fetch('/users.json').then(function(response) {
+fetchp('/users.json').then(function(response) {
   console.log(response.headers.get('Content-Type'))
   console.log(response.headers.get('Date'))
   console.log(response.status)
@@ -71,7 +71,7 @@ fetch('/users.json').then(function(response) {
 ```javascript
 var form = document.querySelector('form')
 
-fetch('/users', {
+fetchp('/users', {
   method: 'post',
   body: new FormData(form)
 })
@@ -80,7 +80,7 @@ fetch('/users', {
 ### Post JSON
 
 ```javascript
-fetch('/users', {
+fetchp('/users', {
   method: 'post',
   headers: {
     'Accept': 'application/json',
@@ -102,7 +102,7 @@ var data = new FormData()
 data.append('file', input.files[0])
 data.append('user', 'hubot')
 
-fetch('/avatars', {
+fetchp('/avatars', {
   method: 'post',
   body: data
 })
@@ -110,20 +110,20 @@ fetch('/avatars', {
 
 ### Caveats
 
-The `fetch` specification differs from `jQuery.ajax()` in mainly two ways that
+The `fetchp` specification differs from `jQuery.ajax()` in mainly two ways that
 bear keeping in mind:
 
-* The Promise returned from `fetch()` **won't reject on HTTP error status**
+* The Promise returned from `fetchp()` **won't reject on HTTP error status**
   even if the response is a HTTP 404 or 500. Instead, it will resolve normally,
   and it will only reject on network failure, or if anything prevented the
   request from completing.
 
-* By default, `fetch` **won't send any cookies** to the server, resulting in
+* By default, `fetchp` **won't send any cookies** to the server, resulting in
   unauthenticated requests if the site relies on maintaining a user session.
 
 #### Handling HTTP error statuses
 
-To have `fetch` Promise reject on HTTP error statuses, i.e. on any non-2xx
+To have `fetchp` Promise reject on HTTP error statuses, i.e. on any non-2xx
 status, define a custom response handler:
 
 ```javascript
@@ -141,7 +141,7 @@ function parseJSON(response) {
   return response.json()
 }
 
-fetch('/users')
+fetchp('/users')
   .then(checkStatus)
   .then(parseJSON)
   .then(function(data) {
@@ -157,12 +157,12 @@ To automatically send cookies for the current domain, the `credentials` option
 must be provided:
 
 ```javascript
-fetch('/users', {
+fetchp('/users', {
   credentials: 'same-origin'
 })
 ```
 
-This option makes `fetch` behave similar to XMLHttpRequest with regards to
+This option makes `fetchp` behave similar to XMLHttpRequest with regards to
 cookies. Otherwise, cookies won't get sent, resulting in these requests not
 preserving the authentication session.
 

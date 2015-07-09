@@ -18,7 +18,7 @@
   "browser": true,
   "worker": true,
   "globals": {
-    "fetch": false,
+    "fetchp": false,
     "Headers": false,
     "Request": false,
     "Response": false,
