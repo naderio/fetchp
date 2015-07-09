@@ -1,15 +1,11 @@
 # window.fetchp
 
-The global `fetchp` function is an easier way to make web requests and handle
-responses than using an XMLHttpRequest. This polyfill is written as closely as
-possible to the standard Fetch specification at https://fetchp.spec.whatwg.org.
+The global `fetchp` function is [fetch](https://github.com/github/fetch)-like interface to JSONP API.
 
 ## Installation
 
-Available on [Bower](http://bower.io) as **fetchp**.
-
 ```sh
-$ bower install fetchp
+$ bower install naderio/fetchp
 ```
 
 You'll also need a Promise polyfill for older browsers.
@@ -18,13 +14,7 @@ You'll also need a Promise polyfill for older browsers.
 $ bower install es6-promise
 ```
 
-This can also be installed with `npm`.
-
-```sh
-$ npm install whatwg-fetchp --save
-```
-
-(For a node.js implementation, try [node-fetchp](https://github.com/bitinn/node-fetchp))
+THE REST IS NOT UPDATED
 
 ## Usage
 
