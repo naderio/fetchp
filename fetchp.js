@@ -282,14 +282,18 @@
         // console.log('callback', arguments);
         body = response;
       });
-      document.currentScript.parentNode.insertBefore(script, document.currentScript);
-      script.src = request.url + (request.url.indexOf('?') > -1 ? '' : '?') + 'callback=' + callback
+      document.head.appendChild(script)
+      script.src = request.url + (request.url.indexOf('?') > -1 ? '&' : '?') + 'callback=' + callback
 
-    })
+    })  
+  }
+
+  if('fetch' in self) {
+    self.fetch.jsonp = self.fetchp;
   }
 
   fetchp._callbacks = {};
-    
+
   function ID() {
     return '_' + Math.random().toString(36).substr(2, 9);
   }
